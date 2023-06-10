@@ -254,7 +254,14 @@ impl AssetFile {
 
         bytes = if minify {
             match file_type {
-                AssetFileType::Css => minify_html::minify(&bytes, &Cfg::spec_compliant()),
+                AssetFileType::Css => {
+					let mut minify_cfg = Cfg::spec_compliant();
+					minify_cfg.minify_css = true;
+					minify_cfg.minify_js = true;
+					minify_cfg.keep_closing_tags = true;
+				
+					minify_html::minify(&bytes, &minify_cfg)
+				},
                 AssetFileType::Icon(image_type) => match image_type {
                     ImageType::Png => oxipng::optimize_from_memory(
                         bytes.as_ref(),
